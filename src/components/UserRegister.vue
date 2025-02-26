@@ -19,6 +19,7 @@
 
 <script>
 import axios from 'axios'; // 引入 axios
+import { ElMessage } from 'element-plus'
 
 export default 
 {
@@ -38,16 +39,18 @@ export default
       }
       console.log(this.username,this.password)
       // 发送 POST 请求到后端注册接口
-      axios.post('http://127.0.0.1:8080/user/register', {
+      axios.post('http://127.0.0.1:8080/user/register', null, {
+        params: {
           username: this.username,
           password: this.password
-        }).then(response => {
+        }
+      }).then(response => {
             if(response.data.code===200){
-              // ElMessage.success('注册成功');
+              ElMessage.success('注册成功');
               this.$router.push('/login');
             }else{
               console.error(response.data)
-              // ElMessage.error('注册失败:'+response.data.data);
+              ElMessage.error('注册失败:'+response.data.data);
             }
           }).catch(error => {
             console.error('注册失败:', error.response ? error.response.data : error.message);
