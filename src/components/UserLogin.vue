@@ -8,7 +8,7 @@
         <div class="input-group">
           <input type="password" v-model="password" placeholder="请输入密码" required />
         </div>
-        <button type="submit" :disabled="!canSubmit">登录</button>
+        <button type="submit" @click="handleLogin">登录</button>
       </form>
       <p class="register-prompt">
         没有账号？<a href="#" @click="goToRegister">立即注册</a>
@@ -19,6 +19,7 @@
 
 <script>
 import axios from 'axios';
+import { ElMessage } from 'element-plus'
 
 export default {
   data() {
@@ -33,25 +34,28 @@ export default {
     }
   },
   methods: {
-    async handleLogin() {
-      if (this.canSubmit) {
-        try {
+    handleLogin() {
           // 使用 GET 请求，将参数附加到 URL 中
-          const response = await axios.get('http://127.0.0.1:8080/user/login', {
+          axios.get('http://127.0.0.1:8080/user/login', {
             params: {
               username: this.username,
               password: this.password
             }
+          }).then(response => {
+            // 处理登录成功的逻辑
+            if(response.data.code===200){
+              ElMessage.success('登录成功');
+              // Store user data in cookie
+              const expireTime = new Date(new Date().getTime() + 12 * 60 * 60 * 1000); // 12 hours from now
+              document.cookie = `token=${JSON.stringify(response.data.data)};expires=${expireTime.toUTCString()};path=/`;
+              this.$router.push('/chat'); // 跳转到空白页面或其他页面
+            }else{
+              ElMessage.error('登录失败:'+response.data.data);
+            }
+          }).catch(error => {
+            // 处理登录失败的逻辑
+            console.error('登录失败:', error.response ? error.response.data : error.message);
           });
-
-          // 处理登录成功的逻辑
-          console.log('登录成功:', response.data);
-          this.$router.push('/blank'); // 跳转到空白页面或其他页面
-        } catch (error) {
-          // 处理登录失败的逻辑
-          console.error('登录失败:', error.response ? error.response.data : error.message);
-        }
-      }
     },
     goToRegister() {
       this.$router.push('/register');
