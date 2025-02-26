@@ -1,17 +1,19 @@
 <template>
-  <div class="register-container">
-    <form @submit.prevent="handleRegister">
-      <div class="input-group">
-        <input type="text" v-model="username" placeholder="请输入用户名" required />
-      </div>
-      <div class="input-group">
-        <input type="password" v-model="password" placeholder="请输入密码" required />
-      </div>
-      <div class="input-group">
-        <input type="password" v-model="confirmPassword" placeholder="请确认密码" required />
-      </div>
-      <button type="submit">注册</button>
-    </form>
+  <div class="register-wrapper">
+    <div class="register-container">
+      <form @submit.prevent="handleRegister">
+        <div class="input-group">
+          <input type="text" v-model="username" placeholder="请输入用户名" required />
+        </div>
+        <div class="input-group">
+          <input type="password" v-model="password" placeholder="请输入密码" required />
+        </div>
+        <div class="input-group">
+          <input type="password" v-model="confirmPassword" placeholder="请确认密码" required />
+        </div>
+        <button type="submit">注册</button>
+      </form>
+    </div>
   </div>
 </template>
 
@@ -38,12 +40,22 @@ export default {
 </script>
 
 <style scoped>
+.register-wrapper {
+  display: flex;
+  justify-content: center; 
+  align-items: center; 
+  height: 100vh; 
+  background-color: #f5f5f5;
+}
+
 .register-container {
   max-width: 300px;
-  margin: 0 auto;
+  width: 100%;
   padding: 20px;
   border: 1px solid #ccc;
   border-radius: 5px;
+  background-color: #fff;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); 
 }
 
 .input-group {

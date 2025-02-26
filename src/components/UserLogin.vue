@@ -1,21 +1,25 @@
 <template>
-  <div class="login-container">
-    <form @submit.prevent="handleLogin">
-      <div class="input-group">
-        <input type="text" v-model="username" placeholder="请输入用户名" required />
-      </div>
-      <div class="input-group">
-        <input type="password" v-model="password" placeholder="请输入密码" required />
-      </div>
-      <button type="submit" :disabled="!canSubmit">登录</button>
-    </form>
-    <p class="register-prompt">
-      没有账号？<a href="#" @click="goToRegister">立即注册</a>
-    </p>
+  <div class="login-wrapper">
+    <div class="login-container">
+      <form @submit.prevent="handleLogin">
+        <div class="input-group">
+          <input type="text" v-model="username" placeholder="请输入用户名" required />
+        </div>
+        <div class="input-group">
+          <input type="password" v-model="password" placeholder="请输入密码" required />
+        </div>
+        <button type="submit" :disabled="!canSubmit">登录</button>
+      </form>
+      <p class="register-prompt">
+        没有账号？<a href="#" @click="goToRegister">立即注册</a>
+      </p>
+    </div>
   </div>
 </template>
 
 <script>
+import axios from 'axios';
+
 export default {
   data() {
     return {
@@ -29,26 +33,50 @@ export default {
     }
   },
   methods: {
-    handleLogin() {
+    async handleLogin() {
       if (this.canSubmit) {
-        console.log('登录信息:', { username: this.username, password: this.password });
-        this.$router.push('/chat');
+        try {
+          // 使用 GET 请求，将参数附加到 URL 中
+          const response = await axios.get('http://127.0.0.1:8080/user/login', {
+            params: {
+              username: this.username,
+              password: this.password
+            }
+          });
+
+          // 处理登录成功的逻辑
+          console.log('登录成功:', response.data);
+          this.$router.push('/blank'); // 跳转到空白页面或其他页面
+        } catch (error) {
+          // 处理登录失败的逻辑
+          console.error('登录失败:', error.response ? error.response.data : error.message);
+        }
       }
     },
     goToRegister() {
-      this.$router.push('/register'); // 跳转注册页面
+      this.$router.push('/register');
     }
   }
 };
 </script>
 
 <style scoped>
+.login-wrapper {
+  display: flex;
+  justify-content: center; 
+  align-items: center; 
+  height: 100vh; 
+  background-color: #f5f5f5; 
+}
+
 .login-container {
   max-width: 300px;
-  margin: 0 auto;
+  width: 100%;
   padding: 20px;
   border: 1px solid #ccc;
   border-radius: 5px;
+  background-color: #fff;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); 
 }
 
 .input-group {
