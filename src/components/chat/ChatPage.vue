@@ -1,7 +1,9 @@
 <template>
   <el-container class="container">
     <!-- 侧边导航栏 -->
-    <el-aside width="200px"><LeftBar style="width: 100%; height: 100%;"/></el-aside>
+    <el-aside width="200px">
+      <LeftBar style="width: 100%; height: 100%;"/>
+    </el-aside>
     <!-- 聊天框主体 -->
     <el-container class="main-container">
       <el-header>Header</el-header>
@@ -17,6 +19,10 @@ import LeftBar from './LeftBar.vue';
 
 export default {
   name: 'ChatPage',
+
+  components: {
+    LeftBar
+  }
 };
 </script>
 
