@@ -32,7 +32,7 @@ export default {
     handleLogin() {
       if (this.canSubmit) {
         console.log('登录信息:', { username: this.username, password: this.password });
-        this.$router.push('/blank'); // 登录后跳转到空白页面（暂定）
+        this.$router.push('/chat');
       }
     },
     goToRegister() {
