@@ -36,7 +36,8 @@ export default {
   },
 
   components: {
-    LeftBar
+    LeftBar,
+    ChatMain
   },
 
   methods: {
@@ -50,7 +51,6 @@ export default {
         });
         if (response.data.code === 200) {
           this.dialogList = response.data.data;
-          console.log('对话列表:', this.dialogList);
         } else {
           console.error(response.data);
         }
