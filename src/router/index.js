@@ -2,7 +2,7 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import UserLogin from '@/components/UserLogin.vue';
 import UserRegister from '@/components/UserRegister.vue';
-import BlankPage from '@/components/BlankPage.vue';
+import ChatPage from '@/components/chat/ChatPage.vue';
 
 const router = createRouter({
   history: createWebHistory(),
@@ -18,9 +18,9 @@ const router = createRouter({
       component: UserRegister
     },
     {
-      path: '/blank',
-      name: 'Blank',
-      component: BlankPage
+      path: '/chat',
+      name: 'Chat',
+      component: ChatPage
     },
     {
       path: '/',
