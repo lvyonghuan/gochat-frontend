@@ -33,7 +33,8 @@ export default {
     data(){
     return {
     messageList:[],
-    input:''
+    input:'',
+    current_dialog_id:0
     };
   },
 
@@ -42,12 +43,12 @@ export default {
         dialog_id: {
             type: Number,
             required: true
-        }
+        },
     },
 
     methods:{
         async getNewMessageList(){
-            if (this.dialog_id===0){
+            if (this.current_dialog_id===0){
                 return;
             }
             // 从后端获取消息列表
@@ -57,7 +58,7 @@ export default {
             const token = document.cookie.split('; ').find(row => row.startsWith('token='))?.split('=')[1];
             const response = await axios.get(`http://127.0.0.1:8080/chat/dialog`, {
                 params: {
-                    dialog_id: this.dialog_id
+                    dialog_id: this.current_dialog_id
                 },
                 headers: {
                     'Authorization': `${token?.replace(/"/g, '')}`
@@ -78,8 +79,9 @@ export default {
                 user_id:1,
                 message:this.input
             });
+
             //判断目前消息列表长度
-            if(this.messageList.length===0){
+            if(this.current_dialog_id==0){
                 this.newDialog();
             }else{
                 this.sendMesage();
@@ -108,11 +110,13 @@ export default {
                     message:response.data.data
                 }
             );
-            this.dialog_id=response.data.dialog_id;
+            this.current_dialog_id=response.data.dialog_id;
 
-            this.$emit('new-dialog-id',response.data.dialog_id);
-            this.$emit('new-dialog-name',response.data.dialog_name);
-            
+            this.$emit('newDialog', {
+                id: response.data.dialog_id,
+                name: response.data.dialog_name
+            });
+
             console.log('消息列表:',this.messageList);
             this.scrollToBottom();
         }else{
@@ -122,7 +126,7 @@ export default {
 
         async sendMesage(){
             const data = qs.stringify({
-                dialog_id: this.dialog_id,
+                dialog_id: this.current_dialog_id,
                 message: this.input
             });
 
@@ -151,10 +155,29 @@ export default {
             this.$nextTick(() => {
                 const scrollbarRef = this.$refs.messageScrollbar;
                 if (scrollbarRef) {
-                    scrollbarRef.setScrollTop(scrollbarRef.wrap.scrollHeight);
+                    try {
+                        // 方法一: 尝试使用 Element UI 的 setScrollTop 方法
+                        if (typeof scrollbarRef.setScrollTop === 'function') {
+                            const scrollHeight = scrollbarRef.$el.querySelector('.el-scrollbar__wrap')?.scrollHeight || 0;
+                            scrollbarRef.setScrollTop(scrollHeight);
+                        } 
+                        // 方法二: 直接操作 DOM
+                        else {
+                            const scrollWrap = scrollbarRef.$el.querySelector('.el-scrollbar__wrap');
+                            if (scrollWrap) {
+                                scrollWrap.scrollTop = scrollWrap.scrollHeight;
+                            }
+                        }
+                    } catch (error) {
+                        console.error('滚动到底部时出错:', error);
+                    }
                 }
             });
-        }
+        },
+
+        changeDialogId(){
+            this.current_dialog_id=this.dialog_id;
+        },
     },
 
     watch:{
@@ -169,11 +192,14 @@ export default {
         // 页面更新后也滚动到底部
         this.scrollToBottom();
     },
+
     mounted() {
         // 组件挂载后滚动到底部
         this.scrollToBottom();
-    }
-};
+        this.changeDialogId();
+    },
+}
+    
 </script>
 
 <style scoped>

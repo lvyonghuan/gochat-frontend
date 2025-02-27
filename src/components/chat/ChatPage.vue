@@ -12,7 +12,7 @@
         </el-card>
       </el-header>
       <el-main>
-        <ChatMain :dialog_id="dialog_id"/>
+        <ChatMain :dialog_id="dialog_id" @newDialog="handleNewDialog"/>
       </el-main>
     </el-container>
   </el-container>
@@ -68,6 +68,12 @@ export default {
       this.dialog_id=0;
       this.dialog_name="新对话";
     },
+
+    handleNewDialog(dialog){
+      this.dialog_id=dialog.id;
+      this.dialog_name=dialog.name;
+      this.dialogList.push(dialog);
+    }
   },
 
   mounted(){
