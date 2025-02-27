@@ -2,9 +2,9 @@
     <el-container class="main-container" direction="vertical">
         <!-- 聊天区域主体 -->
         <el-main class="chat-area">
-            <el-scrollbar class="full-width-scrollbar">
+            <el-scrollbar ref="messageScrollbar" class="full-width-scrollbar">
             <div v-for="(message, index) in messageList" :key="index" class="message-container">
-        <div :class="['message', message.user_id === 0 ? 'message-left' : 'message-right']">
+        <div :class="['message', message.user_id == 0 ? 'message-left' : 'message-right']">
             <div class="message-content">
                 <div class="message-text">{{ message.message }}</div>
             </div>
@@ -15,19 +15,25 @@
 
         <!-- 输入框 -->
         <el-footer class="input-area">
-            输入框
+            <el-container class="footer-input-area">
+                <el-input v-model="input" style="width:50vw" placeholder="" />
+                <div style="width: 1vw;"></div>
+                <el-button type="primary" @click="handelSendMessage">发送</el-button>
+            </el-container>
         </el-footer>
     </el-container>
 </template>
 
 <script>
 import axios from 'axios';
+import qs from 'qs';
 
 export default {
     name: 'ChatMain',
     data(){
     return {
-      messageList:[]
+    messageList:[],
+    input:''
     };
   },
 
@@ -41,6 +47,9 @@ export default {
 
     methods:{
         async getNewMessageList(){
+            if (this.dialog_id===0){
+                return;
+            }
             // 从后端获取消息列表
             // 1. 从 cookie 中获取 token
             // 2. 使用 token 发送 GET 请求到后端
@@ -57,10 +66,94 @@ export default {
 
             if(response.data.code===200){
                 this.messageList=response.data.data;
+                this.scrollToBottom();
                 console.log('消息列表:',this.messageList);
             }else{
                 console.error(response.data);
             }
+        },
+        handelSendMessage(){
+            //将input压入消息列表
+            this.messageList.push({
+                user_id:1,
+                message:this.input
+            });
+            //判断目前消息列表长度
+            if(this.messageList.length===0){
+                this.newDialog();
+            }else{
+                this.sendMesage();
+            }
+
+            this.input='';
+            this.scrollToBottom();
+        },
+
+        async newDialog(){
+            const data = qs.stringify({
+                message: this.input
+            });
+
+            const token = document.cookie.split('; ').find(row => row.startsWith('token='))?.split('=')[1];
+        const response = await axios.post('http://127.0.0.1:8080/chat/new', data, {
+            headers: {
+                'Authorization': `${token?.replace(/"/g, '')}`
+            }
+        });
+
+        if(response.data.code===200){
+            this.messageList.push(
+                {
+                    user_id:0,
+                    message:response.data.data
+                }
+            );
+            this.dialog_id=response.data.dialog_id;
+
+            this.$emit('new-dialog-id',response.data.dialog_id);
+            this.$emit('new-dialog-name',response.data.dialog_name);
+            
+            console.log('消息列表:',this.messageList);
+            this.scrollToBottom();
+        }else{
+            console.error(response.data);
+        }
+        },
+
+        async sendMesage(){
+            const data = qs.stringify({
+                dialog_id: this.dialog_id,
+                message: this.input
+            });
+
+            const token = document.cookie.split('; ').find(row => row.startsWith('token='))?.split('=')[1];
+        const response = await axios.post('http://127.0.0.1:8080/chat/chat', data, {
+            headers: {
+                'Authorization': `${token?.replace(/"/g, '')}`
+            }
+        });
+
+        if(response.data.code===200){
+            this.messageList.push(
+                {
+                    user_id:0,
+                    message:response.data.data
+                }
+            );
+
+            console.log(response.data.data);
+            this.scrollToBottom();
+        }else{
+            console.error(response.data);
+        }
+        },
+        scrollToBottom() {
+            this.$nextTick(() => {
+                const scrollbarRef = this.$refs.messageScrollbar;
+                if (scrollbarRef) {
+                    scrollbarRef.setScrollTop(scrollbarRef.wrap.scrollHeight);
+                }
+            });
         }
     },
 
@@ -71,6 +164,14 @@ export default {
                 this.getNewMessageList();
             }
         }
+    },
+    updated() {
+        // 页面更新后也滚动到底部
+        this.scrollToBottom();
+    },
+    mounted() {
+        // 组件挂载后滚动到底部
+        this.scrollToBottom();
     }
 };
 </script>
@@ -86,13 +187,13 @@ export default {
 }
 
 .chat-area {
-    height: 90%;
+    height: 80%;
     overflow-y: auto;
     padding: 20px;
 }
 
 .input-area {
-    height: 10%;
+    height: 20%;
     min-height: 60px;
     display: flex;
     align-items: center;
@@ -136,5 +237,11 @@ export default {
 .full-width-scrollbar {
     width: 100%;
     height: 100%;
+}
+
+.footer-input-area {
+    width: 100%;
+    display: flex;
+    justify-content: center;
 }
 </style>

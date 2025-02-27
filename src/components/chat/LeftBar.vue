@@ -39,7 +39,7 @@ export default {
     data() {
         return {
             ChatLineSquare,
-            activeIndex: '1' 
+            activeIndex: '0' 
         };
     },
 

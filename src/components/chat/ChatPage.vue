@@ -12,7 +12,7 @@
         </el-card>
       </el-header>
       <el-main>
-        <ChatMain :dialog_id="dialog_id" />
+        <ChatMain :dialog_id="dialog_id"/>
       </el-main>
     </el-container>
   </el-container>
@@ -62,7 +62,6 @@ export default {
     handleDialogSelected(dialog){
       this.dialog_id=dialog.id;
       this.dialog_name=dialog.name;
-      console.log('选中对话:',dialog);
     },
 
     handleCreateNewDialog(){
