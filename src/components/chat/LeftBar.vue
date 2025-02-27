@@ -19,12 +19,13 @@
         
         <!-- 底部设置按钮 占据侧边栏高度的15%-->
         <el-container class="bottom-section">
+            <el-button type="primary" :icon="Setting" class="setting-btn" @click="goToSettings">设置</el-button>
         </el-container>
     </el-container>
 </template>
 
 <script>
-import { ChatLineSquare } from '@element-plus/icons-vue'
+import { ChatLineSquare,Setting } from '@element-plus/icons-vue'
 
 export default {
     name: 'LeftBar',
@@ -38,6 +39,7 @@ export default {
 
     data() {
         return {
+            Setting,
             ChatLineSquare,
             activeIndex: '0' 
         };
@@ -52,6 +54,9 @@ export default {
         },
         createNewDialog() {
             this.$emit('create-new-dialog');
+        },
+        goToSettings() {
+            this.$router.push('/settings');
         }
     }
 };
@@ -73,7 +78,7 @@ export default {
     align-items: center;
 }
 
-.new-chat-btn {
+.new-chat-btn,.setting-btn {
     width: 100%;
 }
 
@@ -109,4 +114,6 @@ export default {
     background: linear-gradient(to left, rgb(255, 255, 255), rgba(0, 0, 0, 0));
     pointer-events: none;
 }
+
+
 </style>

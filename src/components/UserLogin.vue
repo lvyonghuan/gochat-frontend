@@ -8,7 +8,7 @@
         <div class="input-group">
           <input type="password" v-model="password" placeholder="请输入密码" required />
         </div>
-        <button type="submit" @click="handleLogin">登录</button>
+        <button type="submit">登录</button>
       </form>
       <p class="register-prompt">
         没有账号？<a href="#" @click="goToRegister">立即注册</a>
@@ -59,6 +59,9 @@ export default {
     },
     goToRegister() {
       this.$router.push('/register');
+    },
+    goToSettings() {
+      this.$router.push('/settings'); // 跳转到设置页面
     }
   }
 };
@@ -122,4 +125,5 @@ button:disabled {
 .register-prompt a:hover {
   text-decoration: underline;
 }
+
 </style>

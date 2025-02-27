@@ -31,7 +31,8 @@ export default
     };
   },
   methods: {
-    handleRegister() {
+    handleRegister() 
+    {
       // 检查两次输入的密码是否一致
       if (this.password !== this.confirmPassword) {
         alert('两次输入的密码不一致！');
