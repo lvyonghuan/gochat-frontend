@@ -54,39 +54,68 @@
     </div>
 </template>
   
-  <script>
-  import axios from 'axios';
-  export default {
-    data() {
-      return {
-        selectedOption1: 'option1',
-        selectedOption2: 'option2'
-      };
-    },
-    methods: {
-      saveSettings() {
-        // 保存设置的逻辑
-        console.log('保存设置:', this.selectedOption1, this.selectedOption2, this.promptPrefix);
-        // 发送 POST 请求到后端的 /user/set 接口
-        axios.post('http://127.0.0.1:8080/user/set', {
+<script>
+import axios from 'axios';
+
+export default {
+  data() {
+    return {
+      selectedOption1: 'option1',
+      selectedOption2: 'option1',
+      promptPrefix: ''
+    };
+  },
+  mounted() {
+    // 页面加载时从 localStorage 中恢复状态
+    this.restoreState();
+  },
+  methods: {
+    // 保存设置到服务器
+    saveSettings() {
+      console.log('保存设置:', this.selectedOption1, this.selectedOption2, this.promptPrefix);
+
+      // 发送 POST 请求到后端接口
+      axios.post('http://127.0.0.1:8080/user/set', {
         promptPrefix: this.promptPrefix
-        }).then(response => {
-          // 请求成功
-          console.log('保存成功:', response.data);
-          alert('设置已成功保存到服务器！');
-        })
-        .catch(error => {
-          // 请求失败
-          console.error('保存失败:', error);
-          alert('保存失败，请检查网络连接或后端接口是否正常！');
-        })
-      },
-      goBack() {
-        this.$router.push('/chat'); // 直接跳转到聊天界面
+      })
+      .then(response => {
+        console.log('保存成功:', response.data);
+        alert('设置已成功保存到服务器！');
+        this.updateSettingsLocally(); // 更新本地设置
+        this.$router.push('/chat'); // 跳转到聊天界面
+      })
+      .catch(error => {
+        console.error('保存失败:', error);
+        alert('保存失败，请检查网络连接或后端接口是否正常！');
+      });
+    },
+    // 更新本地设置状态到 localStorage
+    updateSettingsLocally() {
+      console.log('更新本地设置:', this.selectedOption1, this.selectedOption2);
+
+      // 保存状态到 localStorage
+      const state = {
+        selectedOption1: this.selectedOption1,
+        selectedOption2: this.selectedOption2
+      };
+      localStorage.setItem('appState', JSON.stringify(state));
+    },
+    // 从 localStorage 中恢复状态
+    restoreState() {
+      const savedState = localStorage.getItem('appState');
+      if (savedState) {
+        const state = JSON.parse(savedState);
+        this.selectedOption1 = state.selectedOption1 || '';
+        this.selectedOption2 = state.selectedOption2 || '';
       }
+    },
+    // 返回聊天界面
+    goBack() {
+      this.$router.push('/chat'); // 跳转到聊天界面
     }
-  };
-  </script>
+  }
+};
+</script>
   
   <style scoped>
   .setting-container {
