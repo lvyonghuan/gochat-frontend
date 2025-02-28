@@ -17,7 +17,7 @@
         <!-- 输入框 -->
         <el-footer class="input-area">
     <el-container class="footer-input-area">
-        <el-input v-model="input" style="width:50vw" placeholder="" :disabled="loading" />
+        <el-input v-model="input" style="width:50vw" placeholder="" :disabled="loading" @keyup.enter="handelSendMessage"/>
         <div style="width: 1vw;"></div>
         <el-button type="primary" @click="handelSendMessage" :loading="loading" :disabled="loading || !input.trim()">发送</el-button>
     </el-container>
