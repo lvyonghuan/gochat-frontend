@@ -38,7 +38,7 @@
         
         <div class="setting-label">设置提示词前缀</div>
         <div>
-          <textarea></textarea>
+          <textarea v-model="promptPrefix"></textarea>
         </div>
         <br>
 
@@ -72,12 +72,22 @@ export default {
   methods: {
     // 保存设置到服务器
     saveSettings() {
-      console.log('保存设置:', this.selectedOption1, this.selectedOption2, this.promptPrefix);
+      const token = document.cookie.split('; ').find(row => row.startsWith('token='))?.split('=')[1];
+      let replyMessage = '';
 
       // 发送 POST 请求到后端接口
-      axios.post('http://127.0.0.1:8080/user/set', {
-        promptPrefix: this.promptPrefix
-      })
+      axios.post('http://127.0.0.1:8080/user/set', 
+  {
+  }, 
+  {
+    headers: {
+      'Authorization': `${token?.replace(/"/g, '')}`
+    },
+    params: {
+      prefix_prompt: this.promptPrefix
+    }
+  }
+)
       .then(response => {
         console.log('保存成功:', response.data);
         alert('设置已成功保存到服务器！');
@@ -88,7 +98,7 @@ export default {
         console.error('保存失败:', error);
         alert('保存失败，请检查网络连接或后端接口是否正常！');
       });
-    },
+        },
     // 更新本地设置状态到 localStorage
     updateSettingsLocally() {
       console.log('更新本地设置:', this.selectedOption1, this.selectedOption2);

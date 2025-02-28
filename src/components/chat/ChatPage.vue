@@ -2,7 +2,7 @@
   <el-container class="container">
     <!-- 侧边导航栏 -->
     <el-aside width="200px">
-      <LeftBar :dialogList="dialogList" @dialog-selected="handleDialogSelected" @create-new-dialog="handleCreateNewDialog" style="width: 100%; height: 100%;"/>
+      <LeftBar :dialogList="dialogList" :new_select_id="new_select_id" @dialog-selected="handleDialogSelected" @create-new-dialog="handleCreateNewDialog" style="width: 100%; height: 100%;"/>
     </el-aside>
     <!-- 聊天框主体 -->
     <el-container class="main-container">
@@ -31,7 +31,8 @@ export default {
     return {
       dialog_id:0,
       dialog_name:"新对话",
-      dialogList:[]
+      dialogList:[],
+      new_select_id:0
     };
   },
 
@@ -82,6 +83,8 @@ export default {
         // 添加新对话
         this.dialogList.push(dialog);
       }
+
+      this.new_select_id = this.dialogList.findIndex(item => item.id === dialog.id);
     }
   },
 
