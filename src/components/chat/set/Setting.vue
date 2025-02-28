@@ -66,10 +66,31 @@ export default {
     };
   },
   mounted() {
+    // 从服务器获取设置
+    this.getSettings();
     // 页面加载时从 localStorage 中恢复状态
     this.restoreState();
   },
   methods: {
+    getSettings(){
+        const token = document.cookie.split('; ').find(row => row.startsWith('token='))?.split('=')[1];
+        
+        axios.get('http://127.0.0.1:8080/user/get', {
+          headers: {
+            'Authorization': `${token?.replace(/"/g, '')}`
+          }
+        })
+        .then(response => {
+          console.log('获取设置成功:', response.data);
+          const config = response.data.data;
+          // 将从服务器获取的配置应用到当前组件
+          this.promptPrefix = config.prefix_prompt;
+        })
+        .catch(error => {
+          console.error('获取设置失败:', error);
+        });
+    },
+
     // 保存设置到服务器
     saveSettings() {
       const token = document.cookie.split('; ').find(row => row.startsWith('token='))?.split('=')[1];
@@ -124,6 +145,7 @@ export default {
       this.$router.push('/chat'); // 跳转到聊天界面
     }
   }
+  
 };
 </script>
   
