@@ -38,7 +38,7 @@
         
         <div class="setting-label">设置提示词前缀</div>
         <div>
-          <textarea></textarea>
+          <textarea v-model="promptPrefix"></textarea>
         </div>
         <br>
 
@@ -66,18 +66,49 @@ export default {
     };
   },
   mounted() {
+    // 从服务器获取设置
+    this.getSettings();
     // 页面加载时从 localStorage 中恢复状态
     this.restoreState();
   },
   methods: {
+    getSettings(){
+        const token = document.cookie.split('; ').find(row => row.startsWith('token='))?.split('=')[1];
+        
+        axios.get('http://127.0.0.1:8080/user/get', {
+          headers: {
+            'Authorization': `${token?.replace(/"/g, '')}`
+          }
+        })
+        .then(response => {
+          console.log('获取设置成功:', response.data);
+          const config = response.data.data;
+          // 将从服务器获取的配置应用到当前组件
+          this.promptPrefix = config.prefix_prompt;
+        })
+        .catch(error => {
+          console.error('获取设置失败:', error);
+        });
+    },
+
     // 保存设置到服务器
     saveSettings() {
-      console.log('保存设置:', this.selectedOption1, this.selectedOption2, this.promptPrefix);
+      const token = document.cookie.split('; ').find(row => row.startsWith('token='))?.split('=')[1];
+      let replyMessage = '';
 
       // 发送 POST 请求到后端接口
-      axios.post('http://127.0.0.1:8080/user/set', {
-        promptPrefix: this.promptPrefix
-      })
+      axios.post('http://127.0.0.1:8080/user/set', 
+  {
+  }, 
+  {
+    headers: {
+      'Authorization': `${token?.replace(/"/g, '')}`
+    },
+    params: {
+      prefix_prompt: this.promptPrefix
+    }
+  }
+)
       .then(response => {
         console.log('保存成功:', response.data);
         alert('设置已成功保存到服务器！');
@@ -88,7 +119,7 @@ export default {
         console.error('保存失败:', error);
         alert('保存失败，请检查网络连接或后端接口是否正常！');
       });
-    },
+        },
     // 更新本地设置状态到 localStorage
     updateSettingsLocally() {
       console.log('更新本地设置:', this.selectedOption1, this.selectedOption2);
@@ -114,6 +145,7 @@ export default {
       this.$router.push('/chat'); // 跳转到聊天界面
     }
   }
+  
 };
 </script>
   
