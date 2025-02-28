@@ -27,7 +27,7 @@
 
 <script>
 import axios from 'axios';
-import qs from 'qs';
+import MarkdownIt from 'markdown-it';
 
 export default {
     name: 'ChatMain',
@@ -36,7 +36,13 @@ export default {
             messageList: [],
             input: '',
             current_dialog_id: 0,
-            loading: false  // 添加 loading 状态变量
+            loading: false,  // 添加 loading 状态变量
+
+            md: new MarkdownIt({
+        html: true,        // 允许HTML标签
+        breaks: true,      // 将\n转换为<br>
+        linkify: true      // 自动转换URL为链接
+      })
         };
     },
 
@@ -332,17 +338,50 @@ export default {
             this.current_dialog_id = this.dialog_id;
         },
 
-        // 添加消息格式化方法
         formatMessage(text) {
-            if (!text) return '';
-            
-            // 替换<think>标签为带有淡色样式的span，并移除其中的换行符
-            return text.replace(/<think>([\s\S]*?)<\/think>/gs, function(match, content) {
-                // 移除content中的换行符
-                const cleanContent = content.replace(/\n/g, ' ').replace(/\r/g, '');
-                return `<span class="think-text">${cleanContent}</span><br/>`;
-            });
-        },
+    if (!text) return '';
+    
+    // 初始化 markdown-it (如果尚未初始化)
+    if (!this.md) {
+        this.md = new MarkdownIt({
+            breaks: true,
+            linkify: true,
+            typographer: true
+        });
+    }
+    
+    // 第一步：将<think>标签内容提取出来，替换为特殊标记
+    let thinkBlocks = [];
+    let processedText = text.replace(/<think>([\s\S]*?)<\/think>/g, function(match, content) {
+        let id = thinkBlocks.length;
+        thinkBlocks.push(content);
+        return `<div id="think-marker-${id}"></div>`;
+    });
+    
+    // 第二步：对非<think>部分应用Markdown渲染
+    let renderedHtml = this.md.render(processedText);
+    
+    // 第三步：将<think>内容重新插入，应用特定样式
+    thinkBlocks.forEach((content, id) => {
+        // 处理<think>内容 - 去除多余换行但保留段落结构
+        let formattedContent = content
+            .replace(/\r/g, '')  // 移除回车符
+            .trim()              // 移除首尾空白
+            .replace(/\n\n+/g, '<br><br>')  // 两个以上连续换行作为段落分隔
+            .replace(/\n/g, ' '); // 单个换行替换为空格
+        
+        // 在渲染后的HTML中查找并替换标记
+        renderedHtml = renderedHtml.replace(
+            `<div id="think-marker-${id}"></div>`,
+            `<div class="think-text">${formattedContent}</div>`
+        );
+    });
+    
+    // 清理可能的多余换行
+    renderedHtml = renderedHtml.replace(/<br\s*\/?>\s*<\/p>/g, '</p>');
+    
+    return renderedHtml;
+}
     },
 
     watch: {
@@ -394,7 +433,7 @@ export default {
 
 .message-container {
     width: 100%;
-    margin-bottom: 15px;
+    margin-bottom: 10px; /* 从15px减少到10px */
     display: flex;
 }
 
@@ -442,5 +481,79 @@ export default {
     color: #999999;
     opacity: 0.7;
     font-style: italic;
+    margin-bottom: 0; /* 移除10px的底部边距 */
+    line-height: 1.3;
+    background-color: #f7f7f7; /* 轻微背景色以区分 */
+    padding: 8px 8px 4px 8px; /* 减少底部内边距 */
+    border-radius: 4px;
+    display: block;
+}
+
+/* Markdown样式 */
+.message-text h1 { font-size: 1.5em; margin: 0.5em 0; }
+.message-text h2 { font-size: 1.3em; margin: 0.5em 0; }
+.message-text h3 { font-size: 1.2em; margin: 0.5em 0; }
+.message-text p { 
+  margin: 0.5em 0 0 0; /* 移除底部边距，只保留顶部边距 */
+}
+.message-text code { 
+  background-color: #f5f5f5; 
+  padding: 2px 4px;
+  border-radius: 3px;
+  font-family: monospace;
+}
+.message-text pre { 
+  background-color: #f5f5f5;
+  padding: 10px;
+  border-radius: 5px;
+  overflow-x: auto;
+}
+.message-text ul, .message-text ol { margin: 0.5em 0; padding-left: 20px; }
+.message-text blockquote {
+  border-left: 3px solid #ddd;
+  margin-left: 0;
+  padding-left: 10px;
+  color: #666;
+}
+.message-text a {
+  color: #0366d6;
+  text-decoration: none;
+}
+.message-text a:hover {
+  text-decoration: underline;
+}
+.message-text table {
+  border-collapse: collapse;
+  margin: 0.5em 0;
+}
+.message-text table th, .message-text table td {
+  border: 1px solid #ddd;
+  padding: 6px 13px;
+}
+.message-text table tr:nth-child(2n) {
+  background-color: #f8f8f8;
+}
+
+/* 更新 think-text 样式 */
+.message :deep(.think-text) {
+    color: #999999;
+    opacity: 0.7;
+    font-style: italic;
+    margin-bottom: 0; /* 移除10px的底部边距 */
+    line-height: 1.3;
+    background-color: #f7f7f7; /* 轻微背景色以区分 */
+    padding: 8px 8px 4px 8px; /* 减少底部内边距 */
+    border-radius: 4px;
+    display: block;
+}
+
+.message :deep(.think-line-break) {
+    line-height: 1.2; /* 减小行间距 */
+    margin-top: 4px; /* 小的顶部间距 */
+}
+
+/* 添加此规则确保最后一个元素没有底部边距 */
+.message-text > *:last-child {
+  margin-bottom: 0;
 }
 </style>
