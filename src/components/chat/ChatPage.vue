@@ -70,9 +70,18 @@ export default {
     },
 
     handleNewDialog(dialog){
-      this.dialog_id=dialog.id;
-      this.dialog_name=dialog.name;
-      this.dialogList.push(dialog);
+      this.dialog_id = dialog.id;
+      this.dialog_name = dialog.name;
+      
+      // 检查列表中是否已存在相同ID的对话
+      const existingIndex = this.dialogList.findIndex(item => item.id === dialog.id);
+      if (existingIndex !== -1) {
+        // 更新已存在的对话
+        this.dialogList[existingIndex] = dialog;
+      } else {
+        // 添加新对话
+        this.dialogList.push(dialog);
+      }
     }
   },
 

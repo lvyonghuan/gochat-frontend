@@ -10,7 +10,7 @@
             <el-scrollbar class="full-width-scrollbar">
                 <el-menu class="dialog-list" :default-active="activeIndex" background-color="#f5f5f5" @select="handleDialogSelect">
                     <!-- 将 dialog.id 转换为字符串 -->
-                    <el-menu-item v-for="dialog in dialogList" :key="dialog.id" :index="String(dialog.id)" class="dialog-item">
+                    <el-menu-item v-for="dialog in [...dialogList].reverse()" :key="dialog.id" :index="String(dialog.id)" class="dialog-item">
                         {{ dialog.name }}
                     </el-menu-item>
                 </el-menu>
