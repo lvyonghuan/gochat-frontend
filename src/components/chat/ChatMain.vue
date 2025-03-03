@@ -292,7 +292,7 @@ export default {
                             }
                             
                             // 添加接收到的消息片段
-                            replyMessage += dataContent;
+                            replyMessage += dataContent+'\n';
                             
                             // 更新现有消息
                             this.messageList[responseIndex].message = replyMessage;
