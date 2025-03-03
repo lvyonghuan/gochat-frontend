@@ -1,8 +1,9 @@
 <template>
   <el-container class="container">
     <!-- 侧边导航栏 -->
-    <el-aside width="200px">
-      <LeftBar :dialogList="dialogList" @dialog-selected="handleDialogSelected" @create-new-dialog="handleCreateNewDialog" style="width: 100%; height: 100%;"/>
+    <el-aside width=200px>
+      <LeftBar :dialogList="dialogList" :new_select_id="new_select_id" @dialog-selected="handleDialogSelected" @create-new-dialog="handleCreateNewDialog" @delete-dialog="deleteDialog" 
+        style="width: 100%; height: 100%;"/>
     </el-aside>
     <!-- 聊天框主体 -->
     <el-container class="main-container">
@@ -18,7 +19,6 @@
   </el-container>
 </template>
 
-
 <script>
 import LeftBar from './LeftBar.vue';
 import ChatMain from './ChatMain.vue';
@@ -27,11 +27,12 @@ import axios from 'axios';
 export default {
   name: 'ChatPage',
 
-  data(){
+  data() {
     return {
-      dialog_id:0,
-      dialog_name:"新对话",
-      dialogList:[]
+      dialog_id: 0,
+      dialog_name: "新对话",
+      dialogList: [],
+      new_select_id: 0,
     };
   },
 
@@ -60,13 +61,13 @@ export default {
     },
 
     handleDialogSelected(dialog){
-      this.dialog_id=dialog.id;
-      this.dialog_name=dialog.name;
+      this.dialog_id = dialog.id;
+      this.dialog_name = dialog.name;
     },
 
     handleCreateNewDialog(){
-      this.dialog_id=0;
-      this.dialog_name="新对话";
+      this.dialog_id = 0;
+      this.dialog_name = "新对话";
     },
 
     handleNewDialog(dialog){
@@ -82,7 +83,11 @@ export default {
         // 添加新对话
         this.dialogList.push(dialog);
       }
+
+      this.new_select_id = this.dialogList.findIndex(item => item.id === dialog.id);
     }
+    //删除逻辑
+
   },
 
   mounted(){
@@ -107,7 +112,6 @@ html, body, #app {
 </style>
 
 <style scoped>
-
 .container {
   width: 100vw;
   height: 100vh;

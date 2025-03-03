@@ -272,9 +272,11 @@ export default {
                 
                 while (true) {
                     const { value, done } = await reader.read();
+                    
                     if (done) break;
                     
                     const chunk = decoder.decode(value, { stream: true });
+                    console.log(chunk);
                     
                     // 处理流的结束
                     if (chunk === "[DONE]") {

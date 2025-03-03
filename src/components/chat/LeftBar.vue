@@ -1,23 +1,25 @@
 <template>
     <el-container direction="vertical" class="left-bar">
-        <!-- 顶部新建对话按钮 占据侧边栏高度的15%-->
+        <!-- 顶部新建对话按钮 占据侧边栏高度的15% -->
         <el-container class="top-section">
             <el-button type="primary" :icon="ChatLineSquare" class="new-chat-btn" @click="createNewDialog">新对话</el-button>
         </el-container>
         
-        <!-- 中部对话历史记录区域 占据侧边栏高度70%-->
+        <!-- 中部对话历史记录区域 占据侧边栏高度70% -->
         <el-container class="middle-section">
             <el-scrollbar class="full-width-scrollbar">
                 <el-menu class="dialog-list" :default-active="activeIndex" background-color="#f5f5f5" @select="handleDialogSelect">
-                    <!-- 将 dialog.id 转换为字符串 -->
-                    <el-menu-item v-for="dialog in [...dialogList].reverse()" :key="dialog.id" :index="String(dialog.id)" class="dialog-item">
-                        {{ dialog.name }}
+                    <el-menu-item v-for="dialog in [...dialogList].reverse()" :key="dialog.id" :index="String(dialog.id)" class="dialog-item" @mouseenter="hoveredDialogId = dialog.id" @mouseleave="hoveredDialogId = null">
+                        <span class="dialog-name">{{ dialog.name }}</span>
+                        <span v-if="hoveredDialogId === dialog.id" class="delete-icon" @click.stop="deleteDialog(dialog.id)">
+                            <el-icon color="#ff4d4f"><Delete /></el-icon>
+                        </span>
                     </el-menu-item>
                 </el-menu>
             </el-scrollbar>
         </el-container>
         
-        <!-- 底部设置按钮 占据侧边栏高度的15%-->
+        <!-- 底部设置按钮 占据侧边栏高度的15% -->
         <el-container class="bottom-section">
             <el-button type="primary" :icon="Setting" class="setting-btn" @click="goToSettings">设置</el-button>
         </el-container>
@@ -25,14 +27,21 @@
 </template>
 
 <script>
-import { ChatLineSquare,Setting } from '@element-plus/icons-vue'
+import { ChatLineSquare, Delete, Setting } from '@element-plus/icons-vue';
 
 export default {
     name: 'LeftBar',
+    components: {
+        Delete
+    },
     
     props: {
         dialogList: {
             type: Array,
+            required: true
+        },
+        new_select_id: {
+            type: Number,
             required: true
         }
     },
@@ -40,15 +49,17 @@ export default {
     data() {
         return {
             Setting,
+            Delete,
             ChatLineSquare,
-            activeIndex: '0' 
+            activeIndex: '0',
+            hoveredDialogId: null 
         };
     },
 
-    methods:{
+    methods: {
         handleDialogSelect(index) {
             const selectedDialog = this.dialogList.find(dialog => String(dialog.id) === index);
-            if(selectedDialog) {
+            if (selectedDialog) {
                 this.$emit('dialog-selected', selectedDialog); 
             }
         },
@@ -57,6 +68,9 @@ export default {
         },
         goToSettings() {
             this.$router.push('/settings');
+        },
+        deleteDialog(dialogId) {
+            this.$emit('delete-dialog', dialogId); 
         }
     }
 };
@@ -67,7 +81,7 @@ export default {
     height: 100%;
     display: flex;
     flex-direction: column;
-    background-color: #f5f5f5;  /* 添加浅灰色背景 */
+    background-color: #f5f5f5; 
 }
 
 .top-section {
@@ -78,7 +92,7 @@ export default {
     align-items: center;
 }
 
-.new-chat-btn,.setting-btn {
+.new-chat-btn, .setting-btn {
     width: 100%;
 }
 
@@ -102,18 +116,30 @@ export default {
     overflow: hidden;
     text-overflow: ellipsis;
     position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
 }
 
-.dialog-item::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    right: 0;
-    height: 100%;
-    width: 25%; 
-    background: linear-gradient(to left, rgb(255, 255, 255), rgba(0, 0, 0, 0));
-    pointer-events: none;
+.dialog-name {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
+.delete-icon {
+    margin-left: 10px; 
+    cursor: pointer;
+    display: flex; 
+    align-items: center;
+    justify-content: center; 
+    visibility: hidden; /* 默认不可见 */
+    transition: visibility 0.3s, color 0.3s; /* 平滑显示和颜色变化 */
+}
 
+.dialog-item:hover .delete-icon {
+    visibility: visible; /* 鼠标悬停时可见 */
+    color: #ff7875; /* 鼠标悬停时改变颜色 */
+}
 </style>
