@@ -18,16 +18,16 @@
   </el-container>
 </template>
 
-
 <script>
 import LeftBar from './LeftBar.vue';
 import ChatMain from './ChatMain.vue';
 import axios from 'axios';
+import { ElMessage, ElMessageBox } from 'element-plus'; // 引入 Element Plus 的消息提示和确认框
 
 export default {
   name: 'ChatPage',
 
-  data(){
+  data() {
     return {
       dialog_id:0,
       dialog_name:"新对话",
@@ -42,6 +42,7 @@ export default {
   },
 
   methods: {
+    // 获取对话列表
     async getDialogList(){
       try{
         const token = document.cookie.split('; ').find(row => row.startsWith('token='))?.split('=')[1];
@@ -60,16 +61,19 @@ export default {
       }
     },
 
+    // 处理对话选择
     handleDialogSelected(dialog){
-      this.dialog_id=dialog.id;
-      this.dialog_name=dialog.name;
+      this.dialog_id = dialog.id;
+      this.dialog_name = dialog.name;
     },
 
+    // 处理新建对话
     handleCreateNewDialog(){
-      this.dialog_id=0;
-      this.dialog_name="新对话";
+      this.dialog_id = 0;
+      this.dialog_name = "新对话";
     },
 
+    // 处理新对话
     handleNewDialog(dialog){
       this.dialog_id = dialog.id;
       this.dialog_name = dialog.name;
@@ -110,7 +114,6 @@ html, body, #app {
 </style>
 
 <style scoped>
-
 .container {
   width: 100vw;
   height: 100vh;
