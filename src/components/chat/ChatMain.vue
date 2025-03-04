@@ -496,7 +496,7 @@ export default {
 .message-text h2 { font-size: 1.3em; margin: 0.5em 0; }
 .message-text h3 { font-size: 1.2em; margin: 0.5em 0; }
 .message-text p { 
-  margin: 0.5em 0 0 0; /* 移除底部边距，只保留顶部边距 */
+  margin: 0.5em 0 0.3em 0; /* 减小段落间距 */
 }
 .message-text code { 
   background-color: #f5f5f5; 
@@ -510,12 +510,35 @@ export default {
   border-radius: 5px;
   overflow-x: auto;
 }
-.message-text ul, .message-text ol { margin: 0.5em 0; padding-left: 20px; }
+
+/* 修复列表对齐问题 */
+.message-text ul, .message-text ol { 
+  margin: 0.3em 0; 
+  padding-left: 2em; /* 增加左侧填充以对齐数字和文本 */
+}
+.message-text ol li {
+  padding-left: 0.3em; /* 为有序列表项添加左侧填充 */
+  margin-bottom: 0.2em; /* 减小列表项之间的间距 */
+}
+.message-text ul li {
+  margin-bottom: 0.2em; /* 减小列表项之间的间距 */
+}
+
+/* 减少段落和块元素之间的空白 */
+.message-text br {
+  line-height: 1; /* 减少br标签的行高 */
+  margin-bottom: 0.3em;
+  display: block; /* 确保它作为块元素可以接受margin */
+  content: ""; /* 必要的，让空元素显示边距 */
+}
+
 .message-text blockquote {
   border-left: 3px solid #ddd;
   margin-left: 0;
   padding-left: 10px;
   color: #666;
+  margin-top: 0.3em;
+  margin-bottom: 0.3em;
 }
 .message-text a {
   color: #0366d6;
@@ -526,7 +549,7 @@ export default {
 }
 .message-text table {
   border-collapse: collapse;
-  margin: 0.5em 0;
+  margin: 0.3em 0;
 }
 .message-text table th, .message-text table td {
   border: 1px solid #ddd;
@@ -534,6 +557,17 @@ export default {
 }
 .message-text table tr:nth-child(2n) {
   background-color: #f8f8f8;
+}
+
+/* 确保最后一个元素没有底部边距 */
+.message-text > *:last-child {
+  margin-bottom: 0;
+}
+
+/* 修复<p>标签内换行问题 */
+.message-text p {
+  line-height: 1.5; /* 适中的行高 */
+  margin:0,
 }
 
 /* 更新 think-text 样式 */
@@ -554,8 +588,188 @@ export default {
     margin-top: 4px; /* 小的顶部间距 */
 }
 
-/* 添加此规则确保最后一个元素没有底部边距 */
+/* 完全移除段落间的边距 */
+.message-text p {
+  margin: 0; /* 移除所有边距 */
+  padding: 0; /* 确保没有内边距 */
+  line-height: 1.4; /* 适中的行高 */
+}
+
+/* 使用选择器为需要间距的元素添加少量上边距 */
+.message-text p + p {
+  margin-top: 0.3em; /* 只在段落与段落之间添加小间距 */
+}
+
+/* 减小列表中段落的边距 */
+.message-text li p {
+  margin: 0; /* 列表中的段落不需要额外边距 */
+}
+
+/* 为不同块元素之间添加最小必要的间距 */
+.message-text h1 + p,
+.message-text h2 + p, 
+.message-text h3 + p,
+.message-text blockquote + p,
+.message-text pre + p,
+.message-text ul + p,
+.message-text ol + p {
+  margin-top: 0.2em;
+}
+
+/* 调整整体行距 */
+.message-text {
+  line-height: 1.3; /* 略微减小整体行距 */
+}
+
+/* 确保最后一个元素没有底部边距 */
 .message-text > *:last-child {
   margin-bottom: 0;
+}
+
+/* 修复列表项中所有元素的边距问题 */
+.message-text li * {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+/* 修复列表对齐和内部间距问题 */
+.message-text ul, .message-text ol { 
+  margin: 0.2em 0; /* 减小列表整体的上下边距 */
+  padding-left: 1.5em; /* 减小左侧填充 */
+}
+
+/* 优化列表项间距 */
+.message-text li {
+  margin: 0.1em 0; /* 极小的列表项间距 */
+  line-height: 1.3; /* 减少行高 */
+}
+
+/* 解决列表中的段落问题 */
+.message-text li p:first-child {
+  display: inline; /* 使第一个段落内联显示 */
+}
+
+/* 处理列表中的后续段落 */
+.message-text li p:not(:first-child) {
+  margin-top: 0.1em;
+  margin-left: 0;
+  padding-left: 0;
+}
+
+/* 修复嵌套列表的边距 */
+.message-text li ul, 
+.message-text li ol {
+  margin-top: 0.1em;
+  margin-bottom: 0.1em;
+}
+
+/* 修复列表中的其他元素 */
+.message-text li h1, 
+.message-text li h2, 
+.message-text li h3, 
+.message-text li h4, 
+.message-text li h5, 
+.message-text li h6 {
+  margin: 0;
+  padding: 0;
+  line-height: 1.3;
+}
+
+/* 强制重置 markdown-it 默认生成的列表样式 */
+.message-text ol,
+.message-text ul {
+  margin: 0.2em 0;
+  padding-left: 1.5em;
+  list-style-position: outside;
+}
+
+/* 复位所有列表项上的所有边距 */
+.message-text li {
+  margin: 0.1em 0;
+  padding: 0;
+  line-height: 1.3;
+}
+
+/* 直接针对列表中的所有元素，包括嵌套标签 */
+.message-text li,
+.message-text li p,
+.message-text li div,
+.message-text li span,
+.message-text li h1,
+.message-text li h2,
+.message-text li h3,
+.message-text li h4,
+.message-text li h5,
+.message-text li h6 {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+/* 让列表中的第一个段落与列表标记在同一行 */
+.message-text li > p:first-child {
+  display: inline-block !important;
+}
+
+/* 专门处理有序列表的数字对齐问题 */
+.message-text ol {
+  counter-reset: item;
+  padding-left: 1em;
+}
+
+.message-text ol > li {
+  position: relative;
+  padding-left: 1.5em;
+  counter-increment: item;
+  list-style: none;
+}
+
+.message-text ol > li:before {
+  content: counter(item) ". ";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1.5em;
+  text-align: right;
+}
+
+/* 使用更强的选择器专门处理 markdown-it 渲染内容 */
+.message-text li.task-list-item {
+  margin-left: 0;
+  list-style: none;
+}
+
+/* 消除列表中的段落引起的额外空间 */
+.message-text li > p {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* 处理嵌套列表 */
+.message-text li > ol,
+.message-text li > ul {
+  margin-top: 0.1em !important;
+  margin-bottom: 0.1em !important;
+  padding-left: 1em !important;
+}
+
+/* 全局强制覆盖所有p标签的边距 */
+.message-text p,
+.message-text li p {
+  margin: 0 !important;
+  padding: 0 !important;
+  line-height: 1.4 !important;
+}
+
+/* 完全移除markdown-it生成的默认边距 */
+.message-text :deep(p) {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* 处理入口级 p 标签之间需要的少量间隔 */
+.message-text > p + p {
+  margin-top: 0.3em !important;
 }
 </style>
