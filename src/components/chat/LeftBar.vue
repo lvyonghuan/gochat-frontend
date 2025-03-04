@@ -17,10 +17,12 @@
               @mouseenter="hoveredDialogId = dialog.id" 
               @mouseleave="hoveredDialogId = null"
             >
-              <span class="dialog-name">{{ dialog.name }}</span>
-              <span v-if="hoveredDialogId === dialog.id" class="delete-icon" @click.stop="$emit('delete-dialog', dialog.id)">
-                <el-icon color="#ff4d4f"><Delete /></el-icon>
-              </span>
+
+            <!-- 删除按钮 -->
+            <span class="dialog-name">{{ dialog.name }}</span>
+            <span v-if="hoveredDialogId === dialog.id" class="delete-icon" @click.stop="$emit('delete-dialog-id', dialog.id)">
+            <el-icon color="#ff4d4f" @click="deleteDialog"><Delete /></el-icon>
+            </span>
             </el-menu-item>
           </el-menu>
         </el-scrollbar>
@@ -75,6 +77,9 @@ export default {
         },
         goToSettings() {
             this.$router.push('/settings');
+        },
+        deleteDialog() {
+            this.$emit('delete-dialog-id', this.hoveredDialogId);
         }
     },
 

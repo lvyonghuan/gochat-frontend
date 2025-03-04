@@ -2,7 +2,7 @@
   <el-container class="container">
     <!-- 侧边导航栏 -->
     <el-aside width="200px">
-      <LeftBar :dialogList="dialogList" :new_select_id="new_select_id" @dialog-selected="handleDialogSelected" @create-new-dialog="handleCreateNewDialog" style="width: 100%; height: 100%;"/>
+      <LeftBar :dialogList="dialogList" :new_select_id="new_select_id" @dialog-selected="handleDialogSelected" @create-new-dialog="handleCreateNewDialog" @delete-dialog-id="handleDeleteDialog" style="width: 100%; height: 100%;"/>
     </el-aside>
     <!-- 聊天框主体 -->
     <el-container class="main-container">
@@ -89,7 +89,32 @@ export default {
       }
 
       this.new_select_id = this.dialogList.findIndex(item => item.id === dialog.id);
+    },
+
+    // 处理删除对话
+    async handleDeleteDialog(dialogId){
+      try{
+        const token = document.cookie.split('; ').find(row => row.startsWith('token='))?.split('=')[1];
+        const response = await axios.delete(`http://127.0.0.1:8080/chat/dialog`, {
+          headers: {
+            'Authorization': `${token?.replace(/"/g, '')}`
+          },
+          params: {
+            "dialog_id": dialogId
+          }
+        });
+      
+        if (response.data.code === 200) {
+          //从对话列表中删除对话
+          this.dialogList = this.dialogList.filter(item => item.id !== dialogId);
+        } else {
+          console.error(response.data);
+        }
+      }catch(error){
+        console.error('删除对话失败:', error);
+      }
     }
+    
   },
 
   mounted(){
