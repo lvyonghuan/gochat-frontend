@@ -76,6 +76,12 @@ export default {
         goToSettings() {
             this.$router.push('/settings');
         }
+    },
+
+    watch:{
+        new_select_id(newVal) {
+            this.activeIndex = String(newVal);
+        }
     }
 };
 </script>

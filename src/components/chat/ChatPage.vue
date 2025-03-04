@@ -2,13 +2,7 @@
   <el-container class="container">
     <!-- 侧边导航栏 -->
     <el-aside width="200px">
-      <LeftBar 
-        :dialogList="dialogList" 
-        :new_select_id="new_select_id" 
-        @dialog-selected="handleDialogSelected" 
-        @create-new-dialog="handleCreateNewDialog" 
-        @delete-dialog="deleteDialog" 
-        style="width: 100%; height: 100%;"/>
+      <LeftBar :dialogList="dialogList" :new_select_id="new_select_id" @dialog-selected="handleDialogSelected" @create-new-dialog="handleCreateNewDialog" style="width: 100%; height: 100%;"/>
     </el-aside>
     <!-- 聊天框主体 -->
     <el-container class="main-container">
@@ -35,10 +29,10 @@ export default {
 
   data() {
     return {
-      dialog_id: 0,
-      dialog_name: "新对话",
-      dialogList: [],
-      new_select_id: 0,
+      dialog_id:0,
+      dialog_name:"新对话",
+      dialogList:[],
+      new_select_id:0
     };
   },
 
@@ -95,44 +89,6 @@ export default {
       }
 
       this.new_select_id = this.dialogList.findIndex(item => item.id === dialog.id);
-    },
-
-    // 删除对话
-    async deleteDialog(dialogId) {
-      try {
-        // 弹出确认框
-        await ElMessageBox.confirm('确定要删除该对话吗？', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        });
-
-        // 调用后端 API 删除对话
-        const token = document.cookie.split('; ').find(row => row.startsWith('token='))?.split('=')[1];
-        const response = await axios.delete(`http://127.0.0.1:8080/chat/delete?id=${dialogId}`, {
-          headers: {
-            'Authorization': `${token?.replace(/"/g, '')}`
-          }
-        });
-
-        if (response.data.code === 200) {
-          // 删除成功，更新 dialogList
-          this.dialogList = this.dialogList.filter(dialog => dialog.id !== dialogId);
-          ElMessage.success('删除成功');
-
-          // 如果删除的是当前选中的对话，重置选中状态
-          if (this.dialog_id === dialogId) {
-            this.dialog_id = 0;
-            this.dialog_name = "新对话";
-          }
-        } else {
-          ElMessage.error('删除失败：' + response.data.message);
-        }
-      } catch (error) {
-        if (error !== 'cancel') { // 用户取消操作时不提示错误
-          ElMessage.error('删除失败：' + (error.response?.data?.message || error.message));
-        }
-      }
     }
   },
 
